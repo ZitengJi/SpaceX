@@ -1,3 +1,38 @@
+namespace SpriteKind {
+    export const FireSource = SpriteKind.create()
+}
+sprites.onCreated(SpriteKind.FireSource, function (sprite) {
+    sprite.setPosition(randint(0, scene.screenWidth()), randint(0, scene.screenHeight()))
+})
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    bullets = sprites.createProjectileFromSprite(img`
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . 4 . . . . . 
+        . . . . 2 . . . . 4 4 . . . . . 
+        . . . . 2 4 . . 4 5 4 . . . . . 
+        . . . . . 2 4 d 5 5 4 . . . . . 
+        . . . . . 2 5 5 5 5 4 . . . . . 
+        . . . . . . 2 5 5 5 5 4 . . . . 
+        . . . . . . 2 5 4 2 4 4 . . . . 
+        . . . . . . 4 4 . . 2 4 4 . . . 
+        . . . . . 4 4 . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        . . . . . . . . . . . . . . . . 
+        `, Spaceship, 0, -50)
+    pause(200)
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.FireSource, function (sprite, otherSprite) {
+    info.changeLifeBy(1)
+    otherSprite.destroy()
+})
+let monster: Sprite = null
+let gasTank: Sprite = null
+let bullets: Sprite = null
+let Spaceship: Sprite = null
 scene.setBackgroundImage(img`
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
@@ -120,7 +155,7 @@ scene.setBackgroundImage(img`
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
     `)
-let Spaceship = sprites.create(img`
+Spaceship = sprites.create(img`
     ................................
     ................................
     ................................
@@ -154,3 +189,56 @@ let Spaceship = sprites.create(img`
     ................................
     ................................
     `, SpriteKind.Player)
+info.setLife(3)
+Spaceship.setStayInScreen(true)
+controller.moveSprite(Spaceship)
+game.onUpdateInterval(2000, function () {
+    gasTank = sprites.create(img`
+        . . . . . . . b b . . . . . . . 
+        . . . . . . b d d b . . . . . . 
+        . . . . . b d 5 5 d b . . . . . 
+        . . . . b b 5 5 5 5 b b . . . . 
+        . . . . b 5 5 5 5 5 5 b . . . . 
+        b b b b b 5 5 5 5 1 1 d b b b b 
+        b 5 5 5 5 5 5 5 5 1 1 1 5 5 5 b 
+        b d d 5 5 5 5 5 5 1 1 1 5 d d b 
+        . b d d 5 5 5 5 5 5 5 5 d d b . 
+        . . b b 5 5 5 5 5 5 5 5 b b . . 
+        . . c b 5 5 5 5 5 5 5 5 b c . . 
+        . . c 5 5 5 5 d d 5 5 5 5 c . . 
+        . . c 5 5 d b b b b d 5 5 c . . 
+        . . c 5 d b c c c c b d 5 c . . 
+        . . c c c c . . . . c c c c . . 
+        . . . . . . . . . . . . . . . . 
+        `, SpriteKind.FireSource)
+    while (info.life() > 0) {
+        monster = sprites.create(img`
+            ........................
+            ........................
+            ........................
+            ........................
+            ..........ffff..........
+            ........ff1111ff........
+            .......fb111111bf.......
+            .......f11111111f.......
+            ......fd11111111df......
+            ......fd11111111df......
+            ......fddd1111dddf......
+            ......fbdbfddfbdbf......
+            ......fcdcf11fcdcf......
+            .......fb111111bf.......
+            ......fffcdb1bdffff.....
+            ....fc111cbfbfc111cf....
+            ....f1b1b1ffff1b1b1f....
+            ....fbfbffffffbfbfbf....
+            .........ffffff.........
+            ...........fff..........
+            ........................
+            ........................
+            ........................
+            ........................
+            `, SpriteKind.Enemy)
+        monster.setPosition(randint(0, scene.screenWidth()), 0)
+        monster.setVelocity(0, 50)
+    }
+})
